@@ -3,7 +3,7 @@ import fitz #PyMuPDF
 from pathlib import Path
 import pprint as pp
 import threading
-import os
+import os, shutil
 import time
 
 THREADS = []
@@ -33,8 +33,9 @@ def thread_find_pdfs(filepath) -> None:
     for file in files_found:
         pdf_to_txt(file)
     PDF_CODE_COUNT -= 1
-    print("Found all pdf files for", filepath.name, PDF_CODE_COUNT, "pdf_codes to go")
+    print(filepath.name, PDF_CODE_COUNT, "pdf_codes to go")
 
+DIRS_TO_CHECK = []
 def pdf_to_txt(file) -> bool:
     pdf_filename: str = file.parts[-1]
     pdf_name: str = pdf_filename.split('.')[0]
@@ -55,13 +56,15 @@ def pdf_to_txt(file) -> bool:
         text = "" # concat to this. txt files could be parsed from more than one pdf page
 
         # check if any txt files were missed. hopefully doesn't bork everything
-        # will rewrite over pdfs that txt files are built from >1 pdf page
+        # will rewrite over pdfs's txt files that are built from >1 pdf page
         if dir_exists:
-            file_count = len([name for name in os.listdir(txt_file_dir) if os.path.isfile(os.path.join(txt_file_dir, name))])
+            file_count: int = len([name for name in os.listdir(txt_file_dir) if os.path.isfile(os.path.join(txt_file_dir, name))])
             if file_count == pdf_file.page_count: #all txt files accounted for.
                 return False
-        else:
-            os.makedirs(txt_file_dir, exist_ok=True)
+            print(f"{pdf_file.page_count = } {file_count = } {txt_file_dir}")
+            DIRS_TO_CHECK.append(txt_file_dir)
+        
+        os.makedirs(txt_file_dir, exist_ok=True)
 
         for page_num in range(pdf_file.page_count):
             page_text = pdf_file.load_page(page_num).get_text("text")
@@ -90,5 +93,11 @@ def main() -> None:
     
     for thread in THREADS:
         thread.start()
+
+    for thread in THREADS:
+        thread.join()
+
+    print("All threads completed")
+    pp.pprint(DIRS_TO_CHECK)
 
 main()
