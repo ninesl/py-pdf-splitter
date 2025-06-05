@@ -1,2 +1,4 @@
+
+.PHONY: run
 run:
-	@python3 pdf_split.py
+	uv run pdf_parse.py $(DAY) $(MONTH) $(YEAR)
