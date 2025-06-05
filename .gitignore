@@ -1,2 +1,4 @@
-paths.py
 __pycache__/
+.env
+.python-version
+pyproject.toml
