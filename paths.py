@@ -4,7 +4,7 @@ home = Path.home()
 #TODO: needs to be a .env variable
 PARENT_DIRECTORY: Path = home / "dev" / "horse_moneyball" / "tracks"
 
-END_PAGE_TEXT: str = "placeholder"
+END_PAGE_TEXT: str = "Equibase Company LLC. All Rights Reserved."
 END_PAGE_LENGTH: int = len(END_PAGE_TEXT) + 1
 
 def get_paths_txt_file(day:str, month:str, year:str) -> Path:
